@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias Atom</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    nav {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav button {
+      background-color: #228026;
+      color: white;
+      padding: 10px;
+      margin: 0 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #noticias {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin: 20px;
+    }
+
+    .noticia {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 10px;
+      padding: 10px;
+      background-color: white;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .noticia h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .noticia p {
+      font-size: 14px;
+      margin: 8px 0;
+    }
+
+    .noticia a {
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .noticia img {
+      max-width: 100%;
+      height: auto;
+      object-fit: cover;
+      display: block;
+      margin: 8px 0;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav>
+    <h2>Ambientadores y velas del Primark</h2>
+    <button onclick="location.href='/'">Index</button>
+    <button onclick="location.href='/noticiasrss'">Noticias RSS</button>
+    <button onclick="location.href='/noticiasatom'">Noticias Atom</button>
+  </nav>
+
+  <div id="noticias"></div>
+
+  <footer>
+    <p>&copy; 2024 Ambientadores y velas del Primark</p>
+    <iframe src="https://www.google.com/maps/d/u/4/embed?mid=1A5QT2KuwHTYWetvL20OVIFFJt22rwQk&ehbc=2E312F&noprof=1" width="640" height="480"></iframe>
+  </footer>
+  
+  <script>
+    // Esta función carga y renderiza las noticias en el cliente.
+    async function cargarNoticias() {
+      try {
+        // Realiza una solicitud AJAX al servidor para obtener los datos Atom.
+        const response = await fetch('/atom');
+        const datosJSON = await response.json();
+
+        // Imprime el objeto JSON en la consola para analizar su estructura.
+        console.log(datosJSON);
+
+        const noticias = datosJSON.feed.entry;
+
+        // Selecciona el contenedor de noticias en el DOM.
+        const contenedorNoticias = document.getElementById('noticias');
+
+        // Función para obtener el enlace de la entrada Atom en el cliente.
+        function obtenerEnlace(entry) {
+          // Verifica si entry.link es un array y tiene elementos.
+          if (Array.isArray(entry.link) && entry.link.length > 0) {
+            // Busca el enlace con rel="alternate" dentro del array link.
+            const enlaceAlternate = entry.link.find(link => link.$.rel === 'alternate');
+            console.log('Enlace alternativo:', enlaceAlternate);
+
+            return enlaceAlternate ? enlaceAlternate._ || '' : '';
+          }
+
+          // Si no se encuentra el enlace, devolvemos una cadena vacía.
+          return '';
+        }
+
+        // Recorre las noticias y las agrega al contenedor.
+        noticias.forEach(entry => {
+          const noticiaElemento = document.createElement('div');
+          noticiaElemento.classList.add('noticia');
+
+          const titulo = entry.title || '';
+          const enlace = obtenerEnlace(entry); // Utiliza la función para obtener el enlace
+          const descripcion = entry.summary || '';
+
+          // Añade el título, resumen y enlace de la noticia.
+          noticiaElemento.innerHTML = `
+            <h2>${titulo}</h2>
+            <p>${descripcion}</p>
+            <a href="${enlace}" target="_blank">Leer más</a>
+          `;
+          // Agrega la noticia al contenedor principal.
+          contenedorNoticias.appendChild(noticiaElemento);
+        });
+      } catch (error) {
+        console.error('Error al cargar las noticias:', error);
+      }
+    }
+
+    // Llama a la función para cargar las noticias cuando la página se carga.
+    window.onload = cargarNoticias;
+  </script>
+</body>
+
+</html>
+

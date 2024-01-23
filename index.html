@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <title>Ambientadores y velas</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    nav {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav button {
+      background-color: #228026;
+      color: white;
+      padding: 10px;
+      margin: 0 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #productos-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin: 20px;
+    }
+
+    #productos-container .producto {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin: 10px;
+      padding: 10px;
+      background-color: white;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #productos-container .producto img {
+      max-width: 100%;
+      height: auto;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #productos-container .producto h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    #productos-container .producto p {
+      font-size: 14px;
+      margin: 8px 0;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <h2>Ambientadores y velas del Primark</h2>
+    <button onclick="location.href='/'">Index</button>
+    <button onclick="location.href='/noticiasrss'">Noticias RSS</button>
+    <button onclick="location.href='/noticiasatom'">Noticias Atom</button>
+  </nav>
+
+  <div id="productos-container">
+    <!-- Los productos se agregarán aquí dinámicamente -->
+  </div>
+  <footer>
+    <p>&copy; 2024 Ambientadores y velas del Primark</p>
+    <iframe src="https://www.google.com/maps/d/u/4/embed?mid=1A5QT2KuwHTYWetvL20OVIFFJt22rwQk&ehbc=2E312F&noprof=1" width="640" height="480"></iframe>
+  </footer>
+  <script>
+    // Función para generar los divs de productos
+    function generarProductos(data) {
+      var container = $('#productos-container');
+
+      data.forEach(function (producto) {
+        var nuevoProducto = $('<div class="producto"><img src="' + producto['imagen-src'] + '" alt="Imagen del producto" width="150" style="display: block; margin: 0 auto;"><div><h3>' + producto.titulo + '</h3><p>Precio: ' + producto.precio + '</p></div></div>');
+        container.append(nuevoProducto);
+      });
+    }
+
+    // Realiza una solicitud GET al servidor y maneja la respuesta
+    $.ajax({
+      url: '/productos',
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        generarProductos(data);
+      },
+      error: function (error) {
+        console.error('Error al cargar y mostrar los productos:', error);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
